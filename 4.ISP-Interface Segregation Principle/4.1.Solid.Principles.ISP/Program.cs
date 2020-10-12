@@ -1,10 +1,10 @@
-﻿using System;
-
-namespace Solid.Principles.ISP
+﻿namespace Solid.Principles
 {
-  class Program
+  using System;
+
+  internal class Program
   {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
       Console.WriteLine("Hello World!");
     }
