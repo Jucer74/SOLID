@@ -8,4 +8,10 @@
     public static readonly string InsertEmployee = "INSERT INTO Employees (FirstName, LastName, HireDate, Email, Phone) VALUES (?, ?, ?, ?, ?)";
     public static readonly string UpdateEmployees = "UPDATE Employees SET HireDate = datetime('now') WHERE Id = 1";
   }
+
+  public enum ReportType
+  {
+    CSV='1',
+    TAB='2'
+  }
 }

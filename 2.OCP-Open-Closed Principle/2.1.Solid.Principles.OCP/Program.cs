@@ -2,6 +2,7 @@
 {
   using System;
   using System.Globalization;
+  using Define;
   using Dto;
 
   internal class Program
@@ -142,13 +143,25 @@
       Console.WriteLine("---------------");
       Console.WriteLine();
 
-      Console.WriteLine("Report File Name : ");
-
+      Console.Write("Report File Name         : ");
       var reportFileName = Console.ReadLine();
+      Console.Write("Report Type (1-CSV 2-TAB): ");
+      char reportTypeOption = ' ';
+      while ((reportTypeOption != (char)ReportType.CSV) && (reportTypeOption != (char)ReportType.TAB))
+      {
+        reportTypeOption = Console.ReadKey().KeyChar;
+      }
+      Console.WriteLine();
 
       var employees = employeeData.GetEmployees();
 
-      ReportGenerator.Generate(reportFileName, employees);
+      var reportType = ReportType.CSV;
+      if(reportTypeOption == (char) ReportType.TAB)
+      {
+        reportType = ReportType.TAB;
+      }
+
+      ReportGenerator.Generate(reportFileName, employees, reportType);
 
       Console.WriteLine("the report was generated.");
     }
