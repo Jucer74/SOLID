@@ -145,8 +145,10 @@
       Console.WriteLine("Report File Name : ");
 
       var reportFileName = Console.ReadLine();
+      
+      var employees = employeeData.GetEmployees();
 
-      employeeData.GenerateReport(reportFileName);
+      ReportGenerator.Generate(reportFileName, employees);
 
       Console.WriteLine("the report was generated.");
     }
