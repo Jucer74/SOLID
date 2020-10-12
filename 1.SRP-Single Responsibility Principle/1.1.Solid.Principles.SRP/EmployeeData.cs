@@ -1,4 +1,4 @@
-﻿namespace Solid.Principles.SRP
+﻿namespace Solid.Principles
 {
   using System;
   using System.Collections.Generic;
