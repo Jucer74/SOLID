@@ -27,7 +27,7 @@
       while (option != '0')
       {
         Console.Clear();
-        Console.WriteLine("SOLID.Principles.SRP.NoApplied");
+        Console.WriteLine("     S.O.L.I.D. Principles    ");
         Console.WriteLine("------------------------------");
         Console.WriteLine("1. Insert new Employee");
         Console.WriteLine("2. Get Employee List");
@@ -146,7 +146,9 @@
 
       var reportFileName = Console.ReadLine();
 
-      employeeData.GenerateReport(reportFileName);
+      var employees = employeeData.GetEmployees();
+
+      ReportGenerator.Generate(reportFileName, employees);
 
       Console.WriteLine("the report was generated.");
     }
