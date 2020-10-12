@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Solid.Principles.SRP
+namespace Solid.Principles
 {
   class Program
   {

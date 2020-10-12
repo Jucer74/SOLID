@@ -1,4 +1,4 @@
-﻿namespace Solid.Principles.SRP
+﻿namespace Solid.Principles
 {
   using System;
   using System.Globalization;
@@ -27,7 +27,7 @@
       while (option != '0')
       {
         Console.Clear();
-        Console.WriteLine("SOLID.Principles.SRP.NoApplied");
+        Console.WriteLine("     S.O.L.I.D. Principles    ");
         Console.WriteLine("------------------------------");
         Console.WriteLine("1. Insert new Employee");
         Console.WriteLine("2. Get Employee List");
