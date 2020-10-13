@@ -7,7 +7,7 @@
 
   internal class Program
   {
-    private static readonly EmployeeData employeeData = new EmployeeData();
+    private static readonly ApplicationData applicationData = new ApplicationData();
 
     private static void Main(string[] args)
     {
@@ -71,7 +71,7 @@
       Console.WriteLine("-------------");
       Console.WriteLine();
 
-      var employees = employeeData.GetEmployees();
+      var employees = applicationData.GetEmployees();
 
       foreach (var emp in employees)
       {
@@ -96,7 +96,7 @@
 
       var employeeDto = CreateEmployeDto();
 
-      if (employeeData.InsertEmployee(employeeDto))
+      if (applicationData.InsertEmployee(employeeDto))
       {
         Console.WriteLine("\nThe Employee was insert Successfully\n");
       }
@@ -154,7 +154,7 @@
 
       Console.WriteLine();
 
-      var employees = employeeData.GetEmployees();
+      var employees = applicationData.GetEmployees();
 
       IReportGenerator reportGenerator = null;
       switch ((ReportType)reportTypeOption)
