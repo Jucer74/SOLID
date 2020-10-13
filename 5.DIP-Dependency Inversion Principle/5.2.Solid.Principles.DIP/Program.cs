@@ -18,6 +18,7 @@
     {
       try
       {
+        Console.WriteLine("Starting...");
         sqlDatabase.CreateAndOpenConnection();
         Menu();
       }
