@@ -4,15 +4,16 @@
   using System.Collections.Generic;
   using System.Data;
   using System.Data.SQLite;
+  using System.IO;
   using Define;
   using Dto;
   using SOLID.Common.SQLData;
 
-  public class EmployeeData
+  public class ApplicationData
   {
     private readonly SqlDatabase sqlDatabase;
 
-    public EmployeeData()
+    public ApplicationData()
     {
       sqlDatabase = new SqlDatabase(GetConnectionString());
     }
@@ -77,6 +78,65 @@
         }
 
         return employees;
+      }
+      finally
+      {
+        sqlDatabase.CloseConnection();
+      }
+    }
+
+    /// <summary>
+    /// Method to generate report
+    /// </summary>
+    public void GenerateReport(string reportFilename)
+    {
+      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
+      var sw = new StreamWriter(fullReportFileName);
+
+      var employees = GetEmployees();
+
+      foreach (var emp in employees)
+      {
+        sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
+      }
+
+      sw.Flush();
+      sw.Close();
+    }
+
+    /// <summary>
+    /// Get the Pjoects from table
+    /// </summary>
+    /// <returns>Projects Dto List</returns>
+    public List<ProjectDto> GetProjects()
+    {
+      try
+      {
+        sqlDatabase.CreateAndOpenConnection();
+
+        var command = sqlDatabase.CreateCommand(Constants.SelectProjects);
+        var dataReader = sqlDatabase.ExecuteReader(command);
+
+        var projects = new List<ProjectDto>();
+
+        while (dataReader.Read())
+        {
+          var prj = new ProjectDto
+          {
+            Id = Convert.ToInt32(dataReader["Id"].ToString()),
+            Name = dataReader["Name"].ToString(),
+            Description = dataReader["Description"].ToString(),
+            Type = dataReader["Type"].ToString()[0],
+            DepartmentName = dataReader["DepartmentName"].ToString(),
+            StartDate = Convert.ToDateTime(dataReader["StartDate"].ToString()),
+            Budget = Convert.ToDecimal(dataReader["Budget"].ToString()),
+            ContractorName = dataReader["ContractorName"].ToString()
+          };
+
+          projects.Add(prj);
+        }
+
+        return projects;
       }
       finally
       {
