@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace Solid.Principles.SRP
 {
   class Program

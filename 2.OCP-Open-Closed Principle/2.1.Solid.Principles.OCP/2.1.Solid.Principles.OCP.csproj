@@ -3,8 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Solid.Principles.OCP</RootNamespace>
+    <RootNamespace>Solid.Principles</RootNamespace>
     <AssemblyName>Solid.Principles.OCP</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\SqlDatabase\ISQLData\ISQLData.csproj" />
+    <ProjectReference Include="..\..\Common\SqlDatabase\SQLData\SQLData.csproj" />
+  </ItemGroup>
 
 </Project>

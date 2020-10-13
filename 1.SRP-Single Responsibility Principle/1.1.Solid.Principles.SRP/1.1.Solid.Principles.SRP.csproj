@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Solid.Principles.SRP</AssemblyName>
-    <RootNamespace>Solid.Principles.SRP</RootNamespace>
+    <RootNamespace>Solid.Principles</RootNamespace>
   </PropertyGroup>
 
 </Project>
