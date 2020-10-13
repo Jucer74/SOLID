@@ -9,11 +9,11 @@
   using Dto;
   using SOLID.Common.SQLData;
 
-  public class EmployeeData
+  public class ApplicationData
   {
     private readonly SqlDatabase sqlDatabase;
 
-    public EmployeeData()
+    public ApplicationData()
     {
       sqlDatabase = new SqlDatabase(GetConnectionString());
     }
@@ -83,25 +83,6 @@
       {
         sqlDatabase.CloseConnection();
       }
-    }
-
-    /// <summary>
-    /// Method to generate report
-    /// </summary>
-    public void GenerateReport(string reportFilename)
-    {
-      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
-      var sw = new StreamWriter(fullReportFileName);
-
-      var employees = GetEmployees();
-
-      foreach (var emp in employees)
-      {
-        sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
-      }
-
-      sw.Flush();
-      sw.Close();
     }
 
     /// <summary>
