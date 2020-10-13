@@ -145,9 +145,9 @@
 
       Console.Write("Report File Name         : ");
       var reportFileName = Console.ReadLine();
-      Console.Write("Report Type (1-CSV 2-TAB): ");
+      Console.Write("Report Type (1-CSV 2-XML): ");
       char reportTypeOption = ' ';
-      while ((reportTypeOption != (char)ReportType.CSV) && (reportTypeOption != (char)ReportType.TAB))
+      while ((reportTypeOption != (char)ReportType.CSV) && (reportTypeOption != (char)ReportType.XML))
       {
         reportTypeOption = Console.ReadKey().KeyChar;
       }
@@ -156,9 +156,9 @@
       var employees = employeeData.GetEmployees();
 
       var reportType = ReportType.CSV;
-      if(reportTypeOption == (char) ReportType.TAB)
+      if(reportTypeOption == (char) ReportType.XML)
       {
-        reportType = ReportType.TAB;
+        reportType = ReportType.XML;
       }
 
       ReportGenerator.Generate(reportFileName, employees, reportType);
