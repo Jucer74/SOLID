@@ -1,13 +1,14 @@
 ﻿namespace Solid.Principles
 {
-  using System;
-  using System.Globalization;
   using Define;
   using Dto;
+  using System;
+  using System.Globalization;
 
   internal class Program
   {
     private static readonly EmployeeData employeeData = new EmployeeData();
+    private static readonly ProjectData projectData = new ProjectData();
 
     private static void Main(string[] args)
     {
@@ -33,6 +34,7 @@
         Console.WriteLine("1. Insert new Employee");
         Console.WriteLine("2. Get Employee List");
         Console.WriteLine("3. Generate Employees Report");
+        Console.WriteLine("4. Show Projects");
         Console.WriteLine("0. Exit");
         Console.WriteLine("Select Option:");
         option = Console.ReadKey().KeyChar;
@@ -43,15 +45,23 @@
           case '0':
             Console.WriteLine("Exit");
             break;
+
           case '1':
             InsertEmployee();
             break;
+
           case '2':
             GetEmployees();
             break;
+
           case '3':
             GenerateReport();
             break;
+
+          case '4':
+            ShowProjects();
+            break;
+
           default:
             Console.WriteLine("Invalid Option");
             break;
@@ -62,6 +72,34 @@
         Console.WriteLine("\nPress any key to continue... ");
         Console.ReadKey();
       }
+    }
+
+    private static void ShowProjects()
+    {
+      Console.Clear();
+      Console.WriteLine("Show Projects");
+      Console.WriteLine("-------------");
+      Console.WriteLine();
+
+      var projectList = projectData.GetProjects();
+
+      Project project=null;
+
+      foreach (var prj in projectList)
+      {
+        if(prj.Type == (char)ProjectType.Internal)
+        {
+          project = new InternalProject();
+        }
+        if (prj.Type == (char)ProjectType.External)
+        {
+          project = new ExternalProject();
+        }
+
+        project.ShowDetails(prj);
+      }
+
+      Console.WriteLine();
     }
 
     private static void GetEmployees()
@@ -162,6 +200,7 @@
         case ReportType.CSV:
           reportGenerator = new ReportCSV();
           break;
+
         case ReportType.XML:
           reportGenerator = new ReportXML();
           break;
