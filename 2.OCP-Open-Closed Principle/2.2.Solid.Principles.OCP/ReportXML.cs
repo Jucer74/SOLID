@@ -2,21 +2,18 @@
 {
   using System.Collections.Generic;
   using System.IO;
+  using System.Xml.Serialization;
   using Define;
   using Dto;
 
-  public class ReportTAB : IReportGenerator
+  public class ReportXML : IReportGenerator
   {
     public void Generate(string reportFilename, List<EmployeeDto> employees)
     {
-      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}.tab";
+      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}.xml";
       var sw = new StreamWriter(fullReportFileName);
-
-      foreach (var emp in employees)
-      {
-        sw.WriteLine($"{emp.Id}\t{emp.FirstName}\t{emp.LastName}\t{emp.HireDate}\t{emp.Email}\t{emp.Phone}");
-      }
-
+      XmlSerializer xml = new XmlSerializer(typeof(List<EmployeeDto>));
+      xml.Serialize(sw, employees);
       sw.Flush();
       sw.Close();
     }

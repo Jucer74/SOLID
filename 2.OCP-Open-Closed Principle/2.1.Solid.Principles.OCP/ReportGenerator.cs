@@ -2,7 +2,8 @@
 {
   using System.Collections.Generic;
   using System.IO;
-  using Define;
+    using System.Xml.Serialization;
+    using Define;
   using Dto;
 
   public class ReportGenerator
@@ -17,8 +18,8 @@
         case ReportType.CSV:
           GenerateCSV(reportFilename, employees);
           break;
-        case ReportType.TAB:
-          GenerateTAB(reportFilename, employees);
+        case ReportType.XML:
+          GenerateXML(reportFilename, employees);
           break;
       }
     }
@@ -37,16 +38,12 @@
       sw.Close();
     }
 
-    private static void GenerateTAB(string reportFilename, List<EmployeeDto> employees)
+    private static void GenerateXML(string reportFilename, List<EmployeeDto> employees)
     {
-      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}.tab";
+      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}.xml";
       var sw = new StreamWriter(fullReportFileName);
-
-      foreach (var emp in employees)
-      {
-        sw.WriteLine($"{emp.Id}\t{emp.FirstName}\t{emp.LastName}\t{emp.HireDate}\t{emp.Email}\t{emp.Phone}");
-      }
-
+      XmlSerializer xml = new XmlSerializer(typeof(List<EmployeeDto>));
+      xml.Serialize(sw, employees);
       sw.Flush();
       sw.Close();
     }

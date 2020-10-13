@@ -145,9 +145,9 @@
 
       Console.Write("Report File Name         : ");
       var reportFileName = Console.ReadLine();
-      Console.Write("Report Type (1-CSV 2-TAB): ");
+      Console.Write("Report Type (1-CSV 2-XML): ");
       var reportTypeOption = ' ';
-      while (reportTypeOption != (char)ReportType.CSV && reportTypeOption != (char)ReportType.TAB)
+      while (reportTypeOption != (char)ReportType.CSV && reportTypeOption != (char)ReportType.XML)
       {
         reportTypeOption = Console.ReadKey().KeyChar;
       }
@@ -162,8 +162,8 @@
         case ReportType.CSV:
           reportGenerator = new ReportCSV();
           break;
-        case ReportType.TAB:
-          reportGenerator = new ReportTAB();
+        case ReportType.XML:
+          reportGenerator = new ReportXML();
           break;
       }
 

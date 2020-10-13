@@ -12,6 +12,6 @@
   public enum ReportType
   {
     CSV='1',
-    TAB='2'
+    XML='2'
   }
 }
