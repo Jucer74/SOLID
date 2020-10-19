@@ -45,3 +45,9 @@ Puede crear una rama nueva a partir de la version de **develop** y nombrela segu
 ej: Curso-01/Julio-Robles
 
 Dentro de cada folder se encuentra la explicación de cada principio y la forma de aplicarlo al proyecto.
+
+### Carpetas
+- **Common/SqlDatabase**: Librería para realizar las operaciones sobre la base de datos.
+- **Images**: Imagenes relacionadas con la explicacion de estos principios.
+- **Reports**: Carpeta en donde se generan los reportes de la apliación.
+- **SOLIDDatabase**: Carpeta donde se encuentra la base de datos necesaria para ejecutar las opciones de este proyecto.
