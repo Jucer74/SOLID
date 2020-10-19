@@ -203,9 +203,7 @@
         case ReportType.XML:
           reportGenerator = new ReportXML();
           break;
-      }
-
-      ;
+      };
 
       reportGenerator.Generate(reportFileName, employees);
 
