@@ -1,13 +1,4 @@
-## Single Responsibility Principle (SRP)
-Un módulo solo debe tener **un motivo para cambiar**.
-
-Lo cual quiere decir que una clase debería estar destinada a **una única responsabilidad** y no mezclar la de otros o las que no le incumben a su dominio.
-
-## Ejemplo
-El siguiente ejemplo es una clase (**ApplicationData**) que permite interactuar con los datos de los empleados y permite generar un reporte con los mismos.
-
-```csharp
-namespace Solid.Principles
+﻿namespace Solid.Principles
 {
   using System;
   using System.Collections.Generic;
@@ -114,6 +105,46 @@ namespace Solid.Principles
     }
 
     /// <summary>
+    /// Get the Pjoects from table
+    /// </summary>
+    /// <returns>Projects Dto List</returns>
+    public List<ProjectDto> GetProjects()
+    {
+      try
+      {
+        sqlDatabase.CreateAndOpenConnection();
+
+        var command = sqlDatabase.CreateCommand(Constants.SelectProjects);
+        var dataReader = sqlDatabase.ExecuteReader(command);
+
+        var projects = new List<ProjectDto>();
+
+        while (dataReader.Read())
+        {
+          var prj = new ProjectDto
+          {
+            Id = Convert.ToInt32(dataReader["Id"].ToString()),
+            Name = dataReader["Name"].ToString(),
+            Description = dataReader["Description"].ToString(),
+            Type = dataReader["Type"].ToString()[0],
+            DepartmentName = dataReader["DepartmentName"].ToString(),
+            StartDate = Convert.ToDateTime(dataReader["StartDate"].ToString()),
+            Budget = Convert.ToDecimal(dataReader["Budget"].ToString()),
+            ContractorName = dataReader["ContractorName"].ToString()
+          };
+
+          projects.Add(prj);
+        }
+
+        return projects;
+      }
+      finally
+      {
+        sqlDatabase.CloseConnection();
+      }
+    }
+
+    /// <summary>
     /// Build the Connection String to the database
     /// </summary>
     /// <returns>Connection String</returns>
@@ -128,48 +159,3 @@ namespace Solid.Principles
     }
   }
 }
-
-```
-
-### Qué anda mal?
-El código en general esta bien, pero el problema es que comparte la responsabilidad de generar un reporte, la cual no esta dentro de su dominio principal, el cual es interactuar con los registro de la tabla **Employees**.
-
-Sabemos que no tiene una sola responsabilidad si hacemos las siguientes preguntas:
-
-* Qué clase debemos cambiar si queremos cambiar el tipo de formato en el que se genera el reporte de separado por comas a XML?
-* Qué clase debemos cambiar si queremos adicionar una funcion para borrar los datos de los empleados?
-
-Si la respuesta es la misma (**ApplicationData**), entonces esta clase no tiene una sola responsabilidad.
-
-### Comó lo solucionamos?
-La forma de solucionarlo es muy sencila, solo separemos responsabilidaddes, y esto lo logramos creando una nueva clase llamada **ReportGenerator** en donde delegamos la responsabilidad de generar el archivo separado por comas y eliminamos esta funcion de la clase **ApplicationData**.
-
-```csharp
-namespace Solid.Principles
-{
-  using System.Collections.Generic;
-  using System.IO;
-  using Define;
-  using Dto;
-
-  public class ReportGenerator
-  {
-    /// <summary>
-    /// Method to generate report
-    /// </summary>
-    public static void Generate(string reportFilename, List<EmployeeDto> employees)
-    {
-      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
-      var sw = new StreamWriter(fullReportFileName);
-
-      foreach (var emp in employees)
-      {
-        sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
-      }
-
-      sw.Flush();
-      sw.Close();
-    }
-  }
-}
-```
