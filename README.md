@@ -28,7 +28,11 @@ El proyecto es una sencilla aplicación de consola, con las siguientes opciones:
     Select Option:
 
 
-Cada una de la opciones realiza accones sobre una pequeña base de datos SQLite con la siguiente estructura:
+Cada una de la opciones realiza acciones sobre una pequeña base de datos SQLite con la siguiente estructura:
+
+![Modelo De Datos](https://github.com/Jucer74/SOLID/blob/develop/Images/SOLIDDB-MER.png)
+
+El proyecto tiene la siguiente estructura:
 
 
-La tabla de empleados 
+
