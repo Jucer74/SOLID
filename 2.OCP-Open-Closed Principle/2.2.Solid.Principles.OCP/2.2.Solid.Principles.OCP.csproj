@@ -7,4 +7,8 @@
     <AssemblyName>Solid.Principles.OCP</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\SqlDatabase\SQLData\SQLData.csproj" />
+  </ItemGroup>
+
 </Project>
