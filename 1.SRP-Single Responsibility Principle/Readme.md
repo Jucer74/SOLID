@@ -4,7 +4,7 @@ Un módulo solo debe tener **un motivo para cambiar**.
 Lo cual quiere decir que una clase debería estar destinada a **una única responsabilidad** y no mezclar la de otros o las que no le incumben a su dominio.
 
 ## Ejemplo
-El siguiente ejemplo es una clase que permite interactuar con los datos de los empleados y permite generar un reporte con los mismos.
+El siguiente ejemplo es una clase (**ApplicationData**) que permite interactuar con los datos de los empleados y permite generar un reporte con los mismos.
 
 ```csharp
 namespace Solid.Principles
@@ -129,9 +129,6 @@ namespace Solid.Principles
   }
 }
 
-
-
-
 ```
 
 ### Qué anda mal?
@@ -144,3 +141,35 @@ Sabemos que no tiene una sola responsabilidad si hacemos las siguientes pregunta
 
 Si la respuesta es la misma (**ApplicationData**), entonces esta clase no tiene una sola responsabilidad.
 
+### Comó lo solucionamos?
+La forma de solucionarlo es muy sencila, solo separemos responsabilidaddes, y esto lo logramos creando una nueva clase llamada **ReportGenerator** en donde delegamos la responsabilidad de generar el archivo separado por comas y eliminamos esta funcion de la clase **ApplicationData**.
+
+```csharp
+namespace Solid.Principles
+{
+  using System.Collections.Generic;
+  using System.IO;
+  using Define;
+  using Dto;
+
+  public class ReportGenerator
+  {
+    /// <summary>
+    /// Method to generate report
+    /// </summary>
+    public static void Generate(string reportFilename, List<EmployeeDto> employees)
+    {
+      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
+      var sw = new StreamWriter(fullReportFileName);
+
+      foreach (var emp in employees)
+      {
+        sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
+      }
+
+      sw.Flush();
+      sw.Close();
+    }
+  }
+}
+```
