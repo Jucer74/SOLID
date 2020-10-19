@@ -1,4 +1,0 @@
-# SOLID
-Principios SOLID
-
-# Develope
