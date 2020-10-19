@@ -62,7 +62,7 @@ namespace Solid.Principles
 ```
 
 ### Qué anda mal?
-Si queremos adicionar un nuevo formato como por ejemplo PDF, deberiamos modificar la misma Clase (**ReportGenerator**), por lo tanto se estaría rompiendo el princio de OCP, pues la idea es que este abierto para extender una nueva funcionalidad sin tener quemodificar la clase.
+Si queremos adicionar un nuevo formato como por ejemplo PDF, deberiamos modificar la misma Clase (**ReportGenerator**), por lo tanto se estaría rompiendo el princio de OCP, pues la idea es que este abierto para extender una nueva funcionalidad sin tener que modificar la clase.
 
 ### Cómo lo solucionamos?
 La forma de solucionarlo es permitir que su implementacion de la función que genera el reporte, no dependa de la clase en si, sino de los argumentos que reciba para poder ejecutar su operación, de la siguiente manera:
