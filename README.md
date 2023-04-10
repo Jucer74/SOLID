@@ -47,7 +47,7 @@ Cree una rama nueva a partir de la version de **main** y nombrela segun el sigui
 - **Nickname**: Se construye utilizando las siguientes reglas
   - 3 primeras letras del primer Nombre
   - 3 primeras letras del primer apellido
-  - 3 primeras letras del segundo apellio
+  - 3 primeras letras del segundo apellido
 Por ejemplo el nickname de Julio Cesar Robles Uribe, seria julroburi. por consiguiente el nombre de la rama seria:
 
 Nueva Rama: **2023-03/julroburi**
