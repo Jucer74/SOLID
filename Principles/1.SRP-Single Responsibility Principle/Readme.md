@@ -140,31 +140,28 @@ Si la respuesta es la misma (**ApplicationData**), entonces esta clase no tiene 
 La forma de solucionarlo es muy sencila, solo separemos responsabilidaddes, y esto lo logramos creando una nueva clase llamada **ReportGenerator** en donde delegamos la responsabilidad de generar el archivo separado por comas y eliminamos esta funcion de la clase **ApplicationData**.
 
 ```csharp
-namespace Solid.Principles
-{
-  using System.Collections.Generic;
-  using System.IO;
-  using Define;
-  using Dto;
+using SOLID.Principles.Define;
+using SOLID.Principles.Dto;
 
-  public class ReportGenerator
-  {
+namespace SOLID.Principles;
+
+public class ReportGenerator
+{
     /// <summary>
     /// Method to generate report
     /// </summary>
     public static void Generate(string reportFilename, List<EmployeeDto> employees)
     {
-      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
-      var sw = new StreamWriter(fullReportFileName);
+        var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
+        var sw = new StreamWriter(fullReportFileName);
 
-      foreach (var emp in employees)
-      {
-        sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
-      }
+        foreach (var emp in employees)
+        {
+            sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
+        }
 
-      sw.Flush();
-      sw.Close();
+        sw.Flush();
+        sw.Close();
     }
-  }
 }
 ```
