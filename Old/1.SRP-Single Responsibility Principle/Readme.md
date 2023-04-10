@@ -7,24 +7,21 @@ Lo cual quiere decir que una clase debería estar destinada a **una única respo
 El siguiente ejemplo es una clase (**ApplicationData**) que permite interactuar con los datos de los empleados y permite generar un reporte con los mismos.
 
 ```csharp
-namespace Solid.Principles
-{
-  using System;
-  using System.Collections.Generic;
-  using System.Data;
-  using System.Data.SQLite;
-  using System.IO;
-  using Define;
-  using Dto;
-  using SOLID.Common.SQLData;
+using SOLID.Common.SQLData;
+using SOLID.Principles.Define;
+using SOLID.Principles.Dto;
+using System.Data;
+using System.Data.SQLite;
 
-  public class ApplicationData
-  {
+namespace SOLID.Principles;
+
+public class ApplicationData
+{
     private readonly SqlDatabase sqlDatabase;
 
     public ApplicationData()
     {
-      sqlDatabase = new SqlDatabase(GetConnectionString());
+        sqlDatabase = new SqlDatabase(GetConnectionString());
     }
 
     /// <summary>
@@ -34,26 +31,26 @@ namespace Solid.Principles
     /// <returns>Successfully inserted or not</returns>
     public bool InsertEmployee(EmployeeDto empDto)
     {
-      try
-      {
-        sqlDatabase.CreateAndOpenConnection();
+        try
+        {
+            sqlDatabase.CreateAndOpenConnection();
 
-        var command = sqlDatabase.CreateCommand(Constants.InsertEmployee);
+            var command = sqlDatabase.CreateCommand(Constants.InsertEmployee);
 
-        sqlDatabase.AddInParameter(command, "FirstName", empDto.FirstName, 50, DbType.String);
-        sqlDatabase.AddInParameter(command, "LastName", empDto.LastName, 50, DbType.String);
-        sqlDatabase.AddInParameter(command, "HireData", empDto.HireDate, 50, DbType.DateTime);
-        sqlDatabase.AddInParameter(command, "Email", empDto.Email, 50, DbType.String);
-        sqlDatabase.AddInParameter(command, "Phone", empDto.Phone, 50, DbType.String);
+            sqlDatabase.AddInParameter(command, "FirstName", empDto.FirstName, 50, DbType.String);
+            sqlDatabase.AddInParameter(command, "LastName", empDto.LastName, 50, DbType.String);
+            sqlDatabase.AddInParameter(command, "HireData", empDto.HireDate, 50, DbType.DateTime);
+            sqlDatabase.AddInParameter(command, "Email", empDto.Email, 50, DbType.String);
+            sqlDatabase.AddInParameter(command, "Phone", empDto.Phone, 50, DbType.String);
 
-        var rowsAffects = sqlDatabase.ExecuteNonQuery(command);
+            var rowsAffects = sqlDatabase.ExecuteNonQuery(command);
 
-        return rowsAffects > 0;
-      }
-      finally
-      {
-        sqlDatabase.CloseConnection();
-      }
+            return rowsAffects > 0;
+        }
+        finally
+        {
+            sqlDatabase.CloseConnection();
+        }
     }
 
     /// <summary>
@@ -62,36 +59,36 @@ namespace Solid.Principles
     /// <returns>a employees Dto List</returns>
     public List<EmployeeDto> GetEmployees()
     {
-      try
-      {
-        sqlDatabase.CreateAndOpenConnection();
-
-        var command = sqlDatabase.CreateCommand(Constants.SelectEmployees);
-        var dataReader = sqlDatabase.ExecuteReader(command);
-
-        var employees = new List<EmployeeDto>();
-
-        while (dataReader.Read())
+        try
         {
-          var emp = new EmployeeDto
-          {
-            Id = Convert.ToInt32(dataReader["Id"].ToString()),
-            FirstName = dataReader["FirstName"].ToString(),
-            LastName = dataReader["LastName"].ToString(),
-            HireDate = Convert.ToDateTime(dataReader["HireDate"].ToString()),
-            Email = dataReader["Email"].ToString(),
-            Phone = dataReader["Phone"].ToString()
-          };
+            sqlDatabase.CreateAndOpenConnection();
 
-          employees.Add(emp);
+            var command = sqlDatabase.CreateCommand(Constants.SelectEmployees);
+            var dataReader = sqlDatabase.ExecuteReader(command);
+
+            var employees = new List<EmployeeDto>();
+
+            while (dataReader.Read())
+            {
+                var emp = new EmployeeDto
+                {
+                    Id = Convert.ToInt32(dataReader["Id"].ToString()),
+                    FirstName = dataReader["FirstName"].ToString()!,
+                    LastName = dataReader["LastName"].ToString()!,
+                    HireDate = Convert.ToDateTime(dataReader["HireDate"].ToString()),
+                    Email = dataReader["Email"].ToString()!,
+                    Phone = dataReader["Phone"].ToString()!
+                };
+
+                employees.Add(emp);
+            }
+
+            return employees;
         }
-
-        return employees;
-      }
-      finally
-      {
-        sqlDatabase.CloseConnection();
-      }
+        finally
+        {
+            sqlDatabase.CloseConnection();
+        }
     }
 
     /// <summary>
@@ -99,18 +96,18 @@ namespace Solid.Principles
     /// </summary>
     public void GenerateReport(string reportFilename)
     {
-      var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
-      var sw = new StreamWriter(fullReportFileName);
+        var fullReportFileName = $"{Constants.ReportsPath}{reportFilename}";
+        var sw = new StreamWriter(fullReportFileName);
 
-      var employees = GetEmployees();
+        var employees = GetEmployees();
 
-      foreach (var emp in employees)
-      {
-        sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
-      }
+        foreach (var emp in employees)
+        {
+            sw.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
+        }
 
-      sw.Flush();
-      sw.Close();
+        sw.Flush();
+        sw.Close();
     }
 
     /// <summary>
@@ -119,16 +116,14 @@ namespace Solid.Principles
     /// <returns>Connection String</returns>
     private static string GetConnectionString()
     {
-      var sqlConnectionStringBuilder = new SQLiteConnectionStringBuilder
-      {
-        DataSource = Constants.DatabaseFileName
-      };
+        var sqlConnectionStringBuilder = new SQLiteConnectionStringBuilder
+        {
+            DataSource = Constants.DatabaseFileName
+        };
 
-      return sqlConnectionStringBuilder.ToString();
+        return sqlConnectionStringBuilder.ToString();
     }
-  }
 }
-
 ```
 
 ### Qué anda mal?
