@@ -8,8 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\ISQLData\ISQLData.csproj" />
     <ProjectReference Include="..\Common\SqlDatabase\ISQLData\ISQLData.csproj" />
     <ProjectReference Include="..\Common\SqlDatabase\SQLData\SQLData.csproj" />
+    <ProjectReference Include="..\Common\SQLData\SQLData.csproj" />
   </ItemGroup>
 
 </Project>
