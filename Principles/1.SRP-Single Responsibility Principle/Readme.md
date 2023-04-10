@@ -165,3 +165,25 @@ public class ReportGenerator
     }
 }
 ```
+De igual forma cambiamos la referencia a la generacion del reporte en la clse principal de **Program** asi:
+
+```csharp
+void GenerateReport()
+{
+    Console.Clear();
+    Console.WriteLine("Generate Report");
+    Console.WriteLine("---------------");
+    Console.WriteLine();
+
+    Console.Write("Report File Name : ");
+
+    var reportFileName = Console.ReadLine();
+
+    var employees = applicationData.GetEmployees();
+
+    ReportGenerator.Generate(reportFileName!, employees);
+
+    Console.WriteLine("the report was generated.");
+}
+```
+
