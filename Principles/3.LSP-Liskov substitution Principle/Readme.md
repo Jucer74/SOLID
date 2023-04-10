@@ -10,74 +10,194 @@ En pocas palabras, que una clase hija puede ser usada como si fuera una clase pa
 Por ejemplo, cuando trabajamos con herencia creamos una clase hija para que herede las funcionalidades de la clase padre pero lo que pasa es que a veces hay métodos que no queremos usar y al ser heredado quedan accesibles a través de nuestra nueva clase. La solución simple es sobrescribirlos y hacer que arrojen una excepción o dejarlos vacío
 
 ### Ejemplo
-En el ejemplo hemos adicionado la opcion de mostrar los datos de los proyectos actuales, bajo los cuales existen principalmente, dos tipos, proyectos internos y proyectos externos.
+En el ejemplo hemos adicionado la opcion de mostrar los datos de los proyectos actuales, en la clase **Program** asi:
+
+```csharp
+void Menu()
+{
+    var option = ' ';
+
+    while (option != '0')
+    {
+        Console.Clear();
+        Console.WriteLine("     S.O.L.I.D. Principles    ");
+        Console.WriteLine("------------------------------");
+        Console.WriteLine("1. Insert new Employee");
+        Console.WriteLine("2. Get Employee List");
+        Console.WriteLine("3. Generate Employees Report");
+        Console.WriteLine("4. Show Projects");
+        Console.WriteLine("0. Exit");
+        Console.WriteLine("Select Option:");
+        option = Console.ReadKey().KeyChar;
+        Console.WriteLine();
+
+        switch (option)
+        {
+            case '0':
+                Console.WriteLine("Exit");
+                break;
+
+            case '1':
+                InsertEmployee();
+                break;
+
+            case '2':
+                GetEmployees();
+                break;
+
+            case '3':
+                GenerateReport();
+                break;
+
+            case '4':
+                ShowProjects();
+                break;
+
+            default:
+                Console.WriteLine("Invalid Option");
+                break;
+        }
+
+      ;
+
+        Console.WriteLine("\nPress any key to continue... ");
+        Console.ReadKey();
+    }
+}
+
+void ShowProjects()
+{
+    Console.Clear();
+    Console.WriteLine("Show Projects");
+    Console.WriteLine("-------------");
+    Console.WriteLine();
+
+    var projectList = applicationData.GetProjects();
+
+    Project project = null;
+
+    foreach (var prj in projectList)
+    {
+        if (prj.Type == (char)ProjectType.Internal)
+        {
+            project = new InternalProject();
+        }
+        if (prj.Type == (char)ProjectType.External)
+        {
+            project = new ExternalProject();
+        }
+
+        project.ShowDetails(prj);
+    }
+
+    Console.WriteLine();
+}
+```
+
+Ahora definimos dos tipos de proyectos, proyectos internos y proyectos externos, los cuales son definidos en la clase **Define** asi:
+```csharp
+public enum ProjectType
+{
+    Internal = 'I',
+    External = 'E'
+}
+```
+
+De igual forma definimos una nueva clase llamada **ProjectDto** para poder administrar los datos de los proyectos asi:
+```csharp
+using System.ComponentModel.DataAnnotations;
+
+namespace Solid.Principles.Dto;
+
+public class ProjectDto
+{
+    [Required]
+    public int Id { get; set; }
+
+    [Required]
+    public string Name { get; set; } = null!;
+
+    [Required]
+    public string Description { get; set; } = null!;
+
+    [Required]
+    public char Type { get; set; }
+
+    [Required]
+    public string DepartmentName { get; set; } = null!;
+
+    [Required]
+    public DateTime StartDate { get; set; }
+
+    [Required]
+    public decimal Budget { get; set; }
+
+    [Required]
+    public string ContractorName { get; set; } = null!;
+}
+```
 
 Ambos heredan de la clase **Project**, la cual permite mostrar los datos básicos del proyecto, así:
 
 ```csharp
-namespace Solid.Principles
-{
-  using Solid.Principles.Define;
-  using Solid.Principles.Dto;
-  using System;
+using SOLID.Principles.Dto;
+using SOLID.Principles.Define;
 
-  public class Project
-  {
+namespace SOLID.Principles;
+
+public class Project
+{
     public virtual void ShowDetails(ProjectDto projectDto)
     {
-      ProjectType projectType = projectDto.Type == (char)ProjectType.Internal? ProjectType.Internal: ProjectType.External;
+        ProjectType projectType = projectDto.Type == (char)ProjectType.Internal ? ProjectType.Internal : ProjectType.External;
 
-      Console.WriteLine("{0}", "".PadRight(50, '-'));
-      Console.WriteLine("Project Details");
-      Console.WriteLine("---------------");
-      Console.WriteLine($"Id : {projectDto.Id}\t\t\tType : {projectDto.Type}-{projectType.ToString()}\n");
-      Console.WriteLine($"Name : {projectDto.Name}\n");
-      Console.WriteLine($"Description :\n{projectDto.Description}\n");
+        Console.WriteLine("{0}", "".PadRight(50, '-'));
+        Console.WriteLine("Project Details");
+        Console.WriteLine("---------------");
+        Console.WriteLine($"Id : {projectDto.Id}\t\t\tType : {projectDto.Type}-{projectType.ToString()}\n");
+        Console.WriteLine($"Name : {projectDto.Name}\n");
+        Console.WriteLine($"Description :\n{projectDto.Description}\n");
     }
-  }
 }
 ```
 
 La clase **InternalProject** permite mostrar los datos adicionales correspondinetes a la información interna.
 
 ```csharp
-namespace Solid.Principles
-{
-  using Solid.Principles.Dto;
-  using System;
+using SOLID.Principles.Dto;
+using SOLID.Principles;
 
-  public class InternalProject: Project
-  {
+namespace SOLID.Principles;
+
+public class InternalProject : Project
+{
     public override void ShowDetails(ProjectDto projectDto)
     {
-      base.ShowDetails(projectDto);
-      Console.WriteLine("Internal Details");
-      Console.WriteLine("----------------");
-      Console.WriteLine($"Start Date : {projectDto.StartDate}\t\tDepartment Name : {projectDto.DepartmentName}\n");
+        base.ShowDetails(projectDto);
+        Console.WriteLine("Internal Details");
+        Console.WriteLine("----------------");
+        Console.WriteLine($"Start Date : {projectDto.StartDate}\t\tDepartment Name : {projectDto.DepartmentName}\n");
     }
-  }
 }
 ```
 
 La clase **ExternalProject** permite mostrar los datos adicionales correspondientes a las información externa. 
 
 ```csharp
-namespace Solid.Principles
+using SOLID.Principles.Dto;
+
+namespace SOLID.Principles;
+
+public class ExternalProject : Project
 {
-  using Solid.Principles.Dto;
-  using System;
-  public class ExternalProject:Project
-  {
     public void ShowBudgetDetails(ProjectDto projectDto)
     {
-      base.ShowDetails(projectDto);
-      Console.WriteLine("External Details");
-      Console.WriteLine("----------------");
-      Console.WriteLine($"Budget : {projectDto.Budget}\t\t\tContractor Name : {projectDto.ContractorName}\n");
+        base.ShowDetails(projectDto);
+        Console.WriteLine("External Details");
+        Console.WriteLine("----------------");
+        Console.WriteLine($"Budget : {projectDto.Budget}\t\t\tContractor Name : {projectDto.ContractorName}\n");
     }
-  }
 }
-
 ```
 
 
@@ -93,7 +213,7 @@ Por otra parte miramos la clase **ExternalProject**, en donde encontramos una nu
 Miremos el llamado actual
 
 ```csharp
-private static void ShowProjects()
+void ShowProjects()
 {
   Console.Clear();
   Console.WriteLine("Show Projects");
