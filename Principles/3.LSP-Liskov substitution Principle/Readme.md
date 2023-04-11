@@ -269,39 +269,8 @@ Lo cual permite mostrar correctamente los datos básicos del proyecto y adiciona
 
 Por otra parte miramos la clase **ExternalProject**, en donde encontramos una nueva función llamada **ShowBudgetDetails** que permite mostrar los datos del proyecto externo, pero notamos que no se implementa o no se sobreescribe la funcion de la clase padre, lo cual solo permite que no se genere excepción al ejecutar el llamado de  esta clase, pero si no se llama a esta nueva función entonces no se muestran los datos del proyecto externo.
 
-Miremos el llamado actual
+Miremos el llamado actual, En este caso la salida de los proyectos es la siguiente:
 
-```csharp
-void ShowProjects()
-{
-  Console.Clear();
-  Console.WriteLine("Show Projects");
-  Console.WriteLine("-------------");
-  Console.WriteLine();
-
-  var projectList = applicationData.GetProjects();
-
-  Project project=null;
-
-  foreach (var prj in projectList)
-  {
-    if(prj.Type == (char)ProjectType.Internal)
-    {
-      project = new InternalProject();
-    }
-    if (prj.Type == (char)ProjectType.External)
-    {
-      project = new ExternalProject();
-    }
-
-    project.ShowDetails(prj);
-  }
-
-  Console.WriteLine();
-}
-``` 
-
-En este caso la salida de los proyectos es la siguiente:
 <pre><code>
 Show Projects
 -------------
@@ -331,18 +300,18 @@ Description :
 Validate compliance with government standards to present new projects.
 </code></pre>
 
-En este caso vemos que el primer proyecto muestra los datos del proyecto y luego adiciona  los datos internos, pero en el segundo solo se muestran los datos básicos y no adiciona los datos externos.
+En este caso vemos que el primer proyecto muestra los datos basicos y luego adiciona los datos internos, pero en el segundo solo se muestran los datos básicos y no adiciona los datos externos.
 
 ### Cómo lo solucionamos?
 La forma de solucionarlo es independizando la implementacion de cada detalle tanto interno como externo, mediante el uso de una interface y una clase que la implementa, así:
 
 **Proyecto Interno**
 
-La Interface
+Definimos La Interface **IInternalDetails** asi:
 ```csharp
-using Solid.Principles.Dto;
+using SOLID.Principles.Dto;
 
-namespace Solid.Principles;
+namespace SOLID.Principles;
 
 public interface IInternalDetails
 {
@@ -350,76 +319,71 @@ public interface IInternalDetails
 }
 ```
 
-La Clase
+Modificamos la Clase **InternalProjec** para adicionar la dependencia de la nueva interface asi:
 ```csharp
-namespace Solid.Principles
-{
-  using Solid.Principles.Dto;
-  using System;
+using SOLID.Principles.Dto;
 
-  public class InternalProject: Project, IInternalDetails
-  {
+namespace SOLID.Principles;
+
+public class InternalProject : Project, IInternalDetails
+{
     public override void ShowDetails(ProjectDto projectDto)
     {
-      base.ShowDetails(projectDto);
-      ShowInternal(projectDto);
+        base.ShowDetails(projectDto);
+        ShowInternal(projectDto);
     }
 
     public void ShowInternal(ProjectDto projectDto)
     {
-      Console.WriteLine("Internal Details");
-      Console.WriteLine("----------------");
-      Console.WriteLine($"Start Date : {projectDto.StartDate}\t\tDepartment Name : {projectDto.DepartmentName}\n");
+        Console.WriteLine("Internal Details");
+        Console.WriteLine("----------------");
+        Console.WriteLine($"Start Date : {projectDto.StartDate}\t\tDepartment Name : {projectDto.DepartmentName}\n");
     }
-  }
 }
 ```
 
 **Proyecto Externo**
 
-La Interface
+Definimos La Interface **IExternalDetails** asi:
 ```csharp
-namespace Solid.Principles
-{
-  using Solid.Principles.Dto;
+using SOLID.Principles.Dto;
 
-  interface IExternalDetails
-  {
+namespace SOLID.Principles;
+
+public interface IExternalDetails
+{
     void ShowExternal(ProjectDto projectDto);
-  }
 }
 ```
 
-La Clase
+Modificamos La Clase **ExternalProject** para adicionar la dependencia de los detalles internos y externos usando las nuevas interfaces asi:
 ```csharp
-namespace Solid.Principles
+using SOLID.Principles.Dto;
+
+namespace SOLID.Principles;
+
+public class ExternalProject : Project, IInternalDetails, IExternalDetails
 {
-  using Solid.Principles.Dto;
-  using System;
-  public class ExternalProject:Project, IInternalDetails, IExternalDetails
-  {
     public override void ShowDetails(ProjectDto projectDto)
     {
-      base.ShowDetails(projectDto);
-      ShowInternal(projectDto);
-      ShowExternal(projectDto);
+        base.ShowDetails(projectDto);
+        ShowInternal(projectDto);
+        ShowExternal(projectDto);
     }
 
     public void ShowInternal(ProjectDto projectDto)
     {
-      Console.WriteLine("Internal Details");
-      Console.WriteLine("----------------");
-      Console.WriteLine($"Start Date : {projectDto.StartDate}\t\tDepartment Name : {projectDto.DepartmentName}\n");
+        Console.WriteLine("Internal Details");
+        Console.WriteLine("----------------");
+        Console.WriteLine($"Start Date : {projectDto.StartDate}\t\tDepartment Name : {projectDto.DepartmentName}\n");
     }
 
     public void ShowExternal(ProjectDto projectDto)
     {
-      Console.WriteLine("External Details");
-      Console.WriteLine("----------------");
-      Console.WriteLine($"Budget : {projectDto.Budget}\t\t\tContractor Name : {projectDto.ContractorName}\n");
+        Console.WriteLine("External Details");
+        Console.WriteLine("----------------");
+        Console.WriteLine($"Budget : {projectDto.Budget}\t\t\tContractor Name : {projectDto.ContractorName}\n");
     }
-
-  }
 }
 ```
 
@@ -430,41 +394,42 @@ De otro lado la interface **IExternalProject** crea una nueva función llamada *
 Ambas clases sobrescriben la funcion **ShowDetails** de la clase padre, pero internamente usan la función base y adicionan solo los datos necesarios segun el tipo de proyecto.
 
 El resultado ahora permite mostrar los datos de forma correcta así:
+<pre><code>
+Show Projects
+-------------
 
-    Show Projects
-    -------------
-    
-    ----------------------------------------------------------------------------------------------------
-    Project Details
-    ---------------
-    Id : 1  Type : I-Internal
-    
-    Name : Digital Transformation
-    
-    Description :
-    Migrate all internal systems to the new cloud platform.
-    
-    Internal Details
-    ----------------
-    Start Date : 10/8/2020 12:00:00 AM  Department Name : IT
-    
-    ----------------------------------------------------------------------------------------------------
-    Project Details
-    ---------------
-    Id : 2  Type : E-External
-    
-    Name : Government Audit
-    
-    Description :
-    Validate compliance with government standards to present new projects.
-    
-    Internal Details
-    ----------------
-    Start Date : 7/27/2020 12:00:00 AM  Department Name : Account
-    
-    External Details
-    ----------------
-    Budget : 15830.99   Contractor Name : Microsoft Corp.
-    
+----------------------------------------------------------------------------------------------------
+Project Details
+---------------
+Id : 1  Type : I-Internal
+
+Name : Digital Transformation
+
+Description :
+Migrate all internal systems to the new cloud platform.
+
+Internal Details
+----------------
+Start Date : 10/8/2020 12:00:00 AM  Department Name : IT
+
+----------------------------------------------------------------------------------------------------
+Project Details
+---------------
+Id : 2  Type : E-External
+
+Name : Government Audit
+
+Description :
+Validate compliance with government standards to present new projects.
+
+Internal Details
+----------------
+Start Date : 7/27/2020 12:00:00 AM  Department Name : Account
+
+External Details
+----------------
+Budget : 15830.99   Contractor Name : Microsoft Corp.
+</code></pre>
+
 Ahora podemos ver que el proyecto Interno muestra los datos básicos y los datos internos, mientras que el proyecto externo muestra estos valores mas los datos externos del proyecto.
 
