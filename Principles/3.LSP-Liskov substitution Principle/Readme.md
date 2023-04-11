@@ -271,7 +271,7 @@ Por otra parte miramos la clase **ExternalProject**, en donde encontramos una nu
 
 Miremos el llamado actual, En este caso la salida de los proyectos es la siguiente:
 
-<pre><code>
+```
 Show Projects
 -------------
 
@@ -298,7 +298,7 @@ Name : Government Audit
 
 Description :
 Validate compliance with government standards to present new projects.
-</code></pre>
+```
 
 En este caso vemos que el primer proyecto muestra los datos basicos y luego adiciona los datos internos, pero en el segundo solo se muestran los datos básicos y no adiciona los datos externos.
 
@@ -394,7 +394,7 @@ De otro lado la interface **IExternalProject** crea una nueva función llamada *
 Ambas clases sobrescriben la funcion **ShowDetails** de la clase padre, pero internamente usan la función base y adicionan solo los datos necesarios segun el tipo de proyecto.
 
 El resultado ahora permite mostrar los datos de forma correcta así:
-<pre><code>
+```
 Show Projects
 -------------
 
@@ -429,7 +429,7 @@ Start Date : 7/27/2020 12:00:00 AM  Department Name : Account
 External Details
 ----------------
 Budget : 15830.99   Contractor Name : Microsoft Corp.
-</code></pre>
+```
 
 Ahora podemos ver que el proyecto Interno muestra los datos básicos y los datos internos, mientras que el proyecto externo muestra estos valores mas los datos externos del proyecto.
 
