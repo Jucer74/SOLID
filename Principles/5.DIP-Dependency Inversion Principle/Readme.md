@@ -39,7 +39,7 @@ public class ProjectData: IProjectData
 
 
 ### Qué anda mal?
-Cada clase internamente utiliza una instancia de la clase **SqlDatabase** para conecarse a la base de datos y si necesitaramos cambiar de tipo de base de datos o cambiar su comportamiento tendriamos que cambiar todas las clases dependientes.
+Cada clase internamente utiliza una instancia de la clase **SqlDatabase** para conectarse a la base de datos y si necesitaramos cambiar de tipo de base de datos o cambiar su comportamiento tendriamos que cambiar todas las clases dependientes.
 
 
 ### Cómo lo solucionamos?
@@ -48,23 +48,20 @@ La solución, como el nombre del principio lo sugiere, es inyectar la instancia 
 Para la clase **EmployeeData**
 
 ```csharp
-namespace Solid.Principles
-{
-  using System;
-  using System.Collections.Generic;
-  using System.Data;
-  using System.Data.SQLite;
-  using Define;
-  using Dto;
-  using SOLID.Common.SQLData.Interface;
+using SOLID.Common.SQLData.Interface;
+using SOLID.Principles.Define;
+using SOLID.Principles.Dto;
+using System.Data;
 
-  public class EmployeeData: IEmployeeData
-  {
+namespace SOLID.Principles;
+
+public class EmployeeData : IEmployeeData
+{
     private readonly ISqlDatabase _sqlDatabase;
 
     public EmployeeData(ISqlDatabase sqlDatabase)
     {
-      _sqlDatabase = sqlDatabase;
+        _sqlDatabase = sqlDatabase;
     }
 
     /// <summary>
@@ -74,17 +71,26 @@ namespace Solid.Principles
     /// <returns>Successfully inserted or not</returns>
     public bool InsertEmployee(EmployeeDto empDto)
     {
-      var command = _sqlDatabase.CreateCommand(Constants.InsertEmployee);
+        try
+        {
+            _sqlDatabase.CreateAndOpenConnection();
 
-      _sqlDatabase.AddInParameter(command, "FirstName", empDto.FirstName, 50, DbType.String);
-      _sqlDatabase.AddInParameter(command, "LastName", empDto.LastName, 50, DbType.String);
-      _sqlDatabase.AddInParameter(command, "HireData", empDto.HireDate, 50, DbType.DateTime);
-      _sqlDatabase.AddInParameter(command, "Email", empDto.Email, 50, DbType.String);
-      _sqlDatabase.AddInParameter(command, "Phone", empDto.Phone, 50, DbType.String);
+            var command = _sqlDatabase.CreateCommand(Constants.InsertEmployee);
 
-      var rowsAffects = _sqlDatabase.ExecuteNonQuery(command);
+            _sqlDatabase.AddInParameter(command, "FirstName", empDto.FirstName, 50, DbType.String);
+            _sqlDatabase.AddInParameter(command, "LastName", empDto.LastName, 50, DbType.String);
+            _sqlDatabase.AddInParameter(command, "HireData", empDto.HireDate, 50, DbType.DateTime);
+            _sqlDatabase.AddInParameter(command, "Email", empDto.Email, 50, DbType.String);
+            _sqlDatabase.AddInParameter(command, "Phone", empDto.Phone, 50, DbType.String);
 
-      return rowsAffects > 0;
+            var rowsAffects = _sqlDatabase.ExecuteNonQuery(command);
+
+            return rowsAffects > 0;
+        }
+        finally
+        {
+            _sqlDatabase.CloseConnection();
+        }
     }
 
     /// <summary>
@@ -93,49 +99,56 @@ namespace Solid.Principles
     /// <returns>a employees Dto List</returns>
     public List<EmployeeDto> GetEmployees()
     {
-      var command = _sqlDatabase.CreateCommand(Constants.SelectEmployees);
-      var dataReader = _sqlDatabase.ExecuteReader(command);
-
-      var employees = new List<EmployeeDto>();
-
-      while (dataReader.Read())
-      {
-        var emp = new EmployeeDto
+        try
         {
-          Id = Convert.ToInt32(dataReader["Id"].ToString()),
-          FirstName = dataReader["FirstName"].ToString(),
-          LastName = dataReader["LastName"].ToString(),
-          HireDate = Convert.ToDateTime(dataReader["HireDate"].ToString()),
-          Email = dataReader["Email"].ToString(),
-          Phone = dataReader["Phone"].ToString()
-        };
+            _sqlDatabase.CreateAndOpenConnection();
 
-        employees.Add(emp);
-      }
+            var command = _sqlDatabase.CreateCommand(Constants.SelectEmployees);
+            var dataReader = _sqlDatabase.ExecuteReader(command);
 
-      return employees;
+            var employees = new List<EmployeeDto>();
+
+            while (dataReader.Read())
+            {
+                var emp = new EmployeeDto
+                {
+                    Id = Convert.ToInt32(dataReader["Id"].ToString()),
+                    FirstName = dataReader["FirstName"].ToString()!,
+                    LastName = dataReader["LastName"].ToString()!,
+                    HireDate = Convert.ToDateTime(dataReader["HireDate"].ToString()),
+                    Email = dataReader["Email"].ToString()!,
+                    Phone = dataReader["Phone"].ToString()!
+                };
+
+                employees.Add(emp);
+            }
+
+            return employees;
+        }
+        finally
+        {
+            _sqlDatabase.CloseConnection();
+        }
     }
-  }
 }
 ```
 
 Y para La Clase **ProjectData**
 ```csharp
-namespace Solid.Principles
-{
-  using System;
-  using System.Collections.Generic;
-  using Define;
-  using Dto;
-  using SOLID.Common.SQLData.Interface;
-  public class ProjectData: IProjectData
-  {
+using SOLID.Common.SQLData.Interface;
+using SOLID.Principles.Define;
+using SOLID.Principles.Dto;
+using System.Data.SQLite;
 
+namespace SOLID.Principles;
+
+public class ProjectData : IProjectData
+{
     private readonly ISqlDatabase _sqlDatabase;
 
     public ProjectData(ISqlDatabase sqlDatabase)
     {
-      _sqlDatabase = sqlDatabase;
+        _sqlDatabase = sqlDatabase;
     }
 
     /// <summary>
@@ -144,77 +157,80 @@ namespace Solid.Principles
     /// <returns>Projects Dto List</returns>
     public List<ProjectDto> GetProjects()
     {
-      var command = _sqlDatabase.CreateCommand(Constants.SelectProjects);
-      var dataReader = _sqlDatabase.ExecuteReader(command);
-
-      var projects = new List<ProjectDto>();
-
-      while (dataReader.Read())
-      {
-        var prj = new ProjectDto
+        try
         {
-          Id = Convert.ToInt32(dataReader["Id"].ToString()),
-          Name = dataReader["Name"].ToString(),
-          Description = dataReader["Description"].ToString(),
-          Type = dataReader["Type"].ToString()[0],
-          DepartmentName = dataReader["DepartmentName"].ToString(),
-          StartDate = Convert.ToDateTime(dataReader["StartDate"].ToString()),
-          Budget = Convert.ToDecimal(dataReader["Budget"].ToString()),
-          ContractorName = dataReader["ContractorName"].ToString()
-        };
+            _sqlDatabase.CreateAndOpenConnection();
 
-        projects.Add(prj);
-      }
+            var command = _sqlDatabase.CreateCommand(Constants.SelectProjects);
+            var dataReader = _sqlDatabase.ExecuteReader(command);
 
-      return projects;
+            var projects = new List<ProjectDto>();
+
+            while (dataReader.Read())
+            {
+                var prj = new ProjectDto
+                {
+                    Id = Convert.ToInt32(dataReader["Id"].ToString()),
+                    Name = dataReader["Name"].ToString()!,
+                    Description = dataReader["Description"].ToString()!,
+                    Type = dataReader["Type"].ToString()![0],
+                    DepartmentName = dataReader["DepartmentName"].ToString()!,
+                    StartDate = Convert.ToDateTime(dataReader["StartDate"].ToString()),
+                    Budget = Convert.ToDecimal(dataReader["Budget"].ToString()),
+                    ContractorName = dataReader["ContractorName"].ToString()!
+                };
+
+                projects.Add(prj);
+            }
+
+            return projects;
+        }
+        finally
+        {
+            _sqlDatabase.CloseConnection();
+        }
     }
-  }
 }
-``` 
 
-Ahora la forma de usarla sería así:
+``` 
+Notese que eliminamos la funcion de GetConnectionString de las clases de datos pero la movimos a la clase P**rogram**.
+
+De igual forma usamos la interface y su instancia de la siguiente manera:
 
 ```csharp
-namespace Solid.Principles
+using SOLID.Common.SQLData.Interface;
+using SOLID.Common.SQLData;
+using SOLID.Principles;
+using SOLID.Principles.Define;
+using SOLID.Principles.Dto;
+using System.Globalization;
+using System.Data.SQLite;
+
+/***********/
+/*-- Main -*/
+/***********/
+ISqlDatabase sqlDatabase = new SqlDatabase(GetConnectionString());
+EmployeeData employeeData = new EmployeeData(sqlDatabase);
+ProjectData projectData = new ProjectData(sqlDatabase);
+
+try
 {
-  using Define;
-  using Dto;
-  using System;
-  using System.Globalization;
-  using SOLID.Common.SQLData;
-  using SOLID.Common.SQLData.Interface;
-  using System.Data.SQLite;
+    Menu();
+}
+catch (Exception e)
+{
+    Console.WriteLine(e);
+}
 
-  internal class Program
-  {
-    private static readonly ISqlDatabase sqlDatabase = new SqlDatabase(GetConnectionString());
-    private static readonly EmployeeData employeeData = new EmployeeData(sqlDatabase);
-    private static readonly ProjectData projectData = new ProjectData(sqlDatabase);
+/*****************/
+/*-- Functions --*/
+/*****************/
+void Menu()
+{
+    var option = ' ';
 
-    private static void Main(string[] args)
+    while (option != '0')
     {
-      try
-      {
-        Console.WriteLine("Starting...");
-        sqlDatabase.CreateAndOpenConnection();
-        Menu();
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e);
-      }
-      finally
-      {
-        sqlDatabase.CloseConnection();
-      }
-    }
-
-    private static void Menu()
-    {
-      var option = ' ';
-
-      while (option != '0')
-      {
         Console.Clear();
         Console.WriteLine("     S.O.L.I.D. Principles    ");
         Console.WriteLine("------------------------------");
@@ -229,191 +245,186 @@ namespace Solid.Principles
 
         switch (option)
         {
-          case '0':
-            Console.WriteLine("Exit");
-            break;
+            case '0':
+                Console.WriteLine("Exit");
+                break;
 
-          case '1':
-            InsertEmployee();
-            break;
+            case '1':
+                InsertEmployee();
+                break;
 
-          case '2':
-            GetEmployees();
-            break;
+            case '2':
+                GetEmployees();
+                break;
 
-          case '3':
-            GenerateReport();
-            break;
+            case '3':
+                GenerateReport();
+                break;
 
-          case '4':
-            ShowProjects();
-            break;
+            case '4':
+                ShowProjects();
+                break;
 
-          default:
-            Console.WriteLine("Invalid Option");
-            break;
+            default:
+                Console.WriteLine("Invalid Option");
+                break;
         }
-
-        ;
-
-        Console.WriteLine("\nPress any key to continue... ");
-        Console.ReadKey();
-      }
-    }
-
-    private static void ShowProjects()
-    {
-      Console.Clear();
-      Console.WriteLine("Show Projects");
-      Console.WriteLine("-------------");
-      Console.WriteLine();
-
-      var projectList = projectData.GetProjects();
-
-      Project project=null;
-
-      foreach (var prj in projectList)
-      {
-        if(prj.Type == (char)ProjectType.Internal)
-        {
-          project = new InternalProject();
-        }
-        if (prj.Type == (char)ProjectType.External)
-        {
-          project = new ExternalProject();
-        }
-
-        project.ShowDetails(prj);
-      }
-
-      Console.WriteLine();
-    }
-
-    private static void GetEmployees()
-    {
-      Console.Clear();
-      Console.WriteLine("Employee List");
-      Console.WriteLine("-------------");
-      Console.WriteLine();
-
-      var employees = employeeData.GetEmployees();
-
-      foreach (var emp in employees)
-      {
-        DisplayEmployee(emp);
-      }
-
-      Console.WriteLine("\n({0}) Rows Retrieved", employees.Count);
-      Console.WriteLine();
-    }
-
-    private static void DisplayEmployee(EmployeeDto emp)
-    {
-      Console.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
-    }
-
-    private static void InsertEmployee()
-    {
-      Console.Clear();
-      Console.WriteLine("Insert new Employee");
-      Console.WriteLine("-------------------");
-      Console.WriteLine();
-
-      var employeeDto = CreateEmployeDto();
-
-      if (employeeData.InsertEmployee(employeeDto))
-      {
-        Console.WriteLine("\nThe Employee was insert Successfully\n");
-      }
-      else
-      {
-        Console.WriteLine("\nThe Employee was not inserted\n");
-      }
-    }
-
-    private static EmployeeDto CreateEmployeDto()
-    {
-      Console.Write("First Name             : ");
-      var firstName = Console.ReadLine();
-      Console.Write("Last Name              : ");
-      var lastName = Console.ReadLine();
-      Console.Write("Hire Date (yyyy-MM-dd) : ");
-      var hireDateString = Console.ReadLine();
-      Console.Write("Email                  : ");
-      var email = Console.ReadLine();
-      Console.Write("Phone                  : ");
-      var phone = Console.ReadLine();
-
-      if (!DateTime.TryParseExact(hireDateString, "yyyy-MM-dd", null, DateTimeStyles.None, out var hireDate))
-      {
-        hireDate = DateTime.Now;
-      }
-
-      var employeeDto = new EmployeeDto
-      {
-        FirstName = firstName,
-        LastName = lastName,
-        HireDate = hireDate,
-        Email = email,
-        Phone = phone
-      };
-
-      return employeeDto;
-    }
-
-    private static void GenerateReport()
-    {
-      Console.Clear();
-      Console.WriteLine("Generate Report");
-      Console.WriteLine("---------------");
-      Console.WriteLine();
-
-      Console.Write("Report File Name         : ");
-      var reportFileName = Console.ReadLine();
-      Console.Write("Report Type (1-CSV 2-XML): ");
-      var reportTypeOption = ' ';
-      while (reportTypeOption != (char)ReportType.CSV && reportTypeOption != (char)ReportType.XML)
-      {
-        reportTypeOption = Console.ReadKey().KeyChar;
-      }
-
-      Console.WriteLine();
-
-      var employees = employeeData.GetEmployees();
-
-      IReportGenerator reportGenerator = null;
-      switch ((ReportType)reportTypeOption)
-      {
-        case ReportType.CSV:
-          reportGenerator = new ReportCSV();
-          break;
-
-        case ReportType.XML:
-          reportGenerator = new ReportXML();
-          break;
-      }
 
       ;
 
-      reportGenerator.Generate(reportFileName, employees);
-
-      Console.WriteLine("the report was generated.");
+        Console.WriteLine("\nPress any key to continue... ");
+        Console.ReadKey();
     }
+}
 
-    /// <summary>
-    /// Build the Connection String to the database
-    /// </summary>
-    /// <returns>Connection String</returns>
-    private static string GetConnectionString()
+void ShowProjects()
+{
+    Console.Clear();
+    Console.WriteLine("Show Projects");
+    Console.WriteLine("-------------");
+    Console.WriteLine();
+
+    var projectList = projectData.GetProjects();
+
+    Project project = null!;
+
+    foreach (var prj in projectList)
     {
-      var sqlConnectionStringBuilder = new SQLiteConnectionStringBuilder
-      {
-        DataSource = Constants.DatabaseFileName
-      };
+        if (prj.Type == (char)ProjectType.Internal)
+        {
+            project = new InternalProject();
+        }
+        if (prj.Type == (char)ProjectType.External)
+        {
+            project = new ExternalProject();
+        }
 
-      return sqlConnectionStringBuilder.ToString();
+        project.ShowDetails(prj);
     }
-  }
+
+    Console.WriteLine();
+}
+
+void GetEmployees()
+{
+    Console.Clear();
+    Console.WriteLine("Employee List");
+    Console.WriteLine("-------------");
+    Console.WriteLine();
+
+    var employees = employeeData.GetEmployees();
+
+    foreach (var emp in employees)
+    {
+        DisplayEmployee(emp);
+    }
+
+    Console.WriteLine("\n({0}) Rows Retrieved", employees.Count);
+    Console.WriteLine();
+}
+
+void DisplayEmployee(EmployeeDto emp)
+{
+    Console.WriteLine($"{emp.Id},{emp.FirstName},{emp.LastName},{emp.HireDate},{emp.Email},{emp.Phone}");
+}
+
+void InsertEmployee()
+{
+    Console.Clear();
+    Console.WriteLine("Insert new Employee");
+    Console.WriteLine("-------------------");
+    Console.WriteLine();
+
+    var employeeDto = CreateEmployeDto();
+
+    if (employeeData.InsertEmployee(employeeDto))
+    {
+        Console.WriteLine("\nThe Employee was insert Successfully\n");
+    }
+    else
+    {
+        Console.WriteLine("\nThe Employee was not inserted\n");
+    }
+}
+
+EmployeeDto CreateEmployeDto()
+{
+    Console.Write("First Name             : ");
+    var firstName = Console.ReadLine();
+    Console.Write("Last Name              : ");
+    var lastName = Console.ReadLine();
+    Console.Write("Hire Date (yyyy-MM-dd) : ");
+    var hireDateString = Console.ReadLine();
+    Console.Write("Email                  : ");
+    var email = Console.ReadLine();
+    Console.Write("Phone                  : ");
+    var phone = Console.ReadLine();
+
+    if (!DateTime.TryParseExact(hireDateString, "yyyy-MM-dd", null, DateTimeStyles.None, out var hireDate))
+    {
+        hireDate = DateTime.Now;
+    }
+
+    var employeeDto = new EmployeeDto
+    {
+        FirstName = firstName!,
+        LastName = lastName!,
+        HireDate = hireDate,
+        Email = email!,
+        Phone = phone!
+    };
+
+    return employeeDto;
+}
+
+void GenerateReport()
+{
+    Console.Clear();
+    Console.WriteLine("Generate Report");
+    Console.WriteLine("---------------");
+    Console.WriteLine();
+
+    Console.Write("Report File Name         : ");
+    var reportFileName = Console.ReadLine();
+    Console.Write("Report Type (1-CSV 2-XML): ");
+    var reportTypeOption = ' ';
+    while (reportTypeOption != (char)ReportType.CSV && reportTypeOption != (char)ReportType.XML)
+    {
+        reportTypeOption = Console.ReadKey().KeyChar;
+    }
+
+    Console.WriteLine();
+
+    var employees = employeeData.GetEmployees();
+
+    IReportGenerator reportGenerator = null!;
+    switch ((ReportType)reportTypeOption)
+    {
+        case ReportType.CSV:
+            reportGenerator = new ReportCSV();
+            break;
+
+        case ReportType.XML:
+            reportGenerator = new ReportXML();
+            break;
+    };
+
+    reportGenerator.Generate(reportFileName!, employees);
+
+    Console.WriteLine("the report was generated.");
+}
+
+/// Build the Connection String to the database
+/// </summary>
+/// <returns>Connection String</returns>
+string GetConnectionString()
+{
+    var sqlConnectionStringBuilder = new SQLiteConnectionStringBuilder
+    {
+        DataSource = Constants.DatabaseFileName
+    };
+
+    return sqlConnectionStringBuilder.ToString();
 }
 ``` 
 
